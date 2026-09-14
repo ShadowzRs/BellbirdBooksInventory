@@ -1,5 +1,3 @@
-# BellbirdBooksInventory
-
 # Bellbird Project
 
 ## Project Structure
@@ -7,9 +5,11 @@
 - `frontend/` - React frontend
 - `backend/` - Express backend
 
-# Install Gitbas: https://git-scm.com/install/windows
-
 ## Running the project
+
+### Install Gitbas
+
+- https://git-scm.com/install/windows
 
 ### Frontend
 
