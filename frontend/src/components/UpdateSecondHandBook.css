@@ -1,0 +1,184 @@
+.update-book-container {
+  min-height: 100vh;
+  padding: 40px;
+  background-color: #f5f6f8;
+  color: #222222;
+  box-sizing: border-box;
+}
+
+.update-book-card {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #ffffff;
+  color: #222222;
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+}
+
+.update-book-card h1 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  color: #222222;
+  text-align: center;
+}
+
+.page-description {
+  margin: 0 0 30px;
+  color: #555555;
+  text-align: center;
+  font-size: 16px;
+}
+
+/* Form */
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #222222;
+}
+
+/* Input and select */
+
+.update-book-card select,
+.update-book-card input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #cccccc;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+
+  background-color: #ffffff;
+  color: #222222;
+
+  appearance: auto;
+}
+
+.update-book-card select:focus,
+.update-book-card input:focus {
+  outline: none;
+  border-color: #555555;
+  box-shadow: 0 0 0 2px rgba(85, 85, 85, 0.1);
+}
+
+.update-book-card input::placeholder {
+  color: #888888;
+}
+
+/* Book details */
+
+.book-details {
+  margin: 25px 0;
+  padding: 20px;
+  border: 1px solid #dddddd;
+  border-radius: 8px;
+  background-color: #fafafa;
+  color: #222222;
+}
+
+.book-details h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  font-size: 20px;
+  color: #222222;
+  text-align: center;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.details-grid div {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #666666;
+}
+
+.details-grid div span:not(.detail-label) {
+  color: #333333;
+  font-size: 16px;
+}
+
+/* Update button */
+
+.update-button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 6px;
+
+  background-color: #222222;
+  color: #ffffff;
+
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.update-button:hover {
+  background-color: #444444;
+}
+
+.update-button:active {
+  background-color: #111111;
+}
+
+/* Success message */
+
+.success-message {
+  margin-bottom: 18px;
+  padding: 12px;
+
+  border: 1px solid #b7ddb7;
+  border-radius: 6px;
+
+  background-color: #e8f7e8;
+  color: #207020;
+
+  font-weight: 500;
+}
+
+/* Error message */
+
+.error-message {
+  margin-bottom: 18px;
+  padding: 12px;
+
+  border: 1px solid #e5b8b8;
+  border-radius: 6px;
+
+  background-color: #fdeaea;
+  color: #b00020;
+
+  font-weight: 500;
+}
+
+/* Mobile */
+
+@media (max-width: 700px) {
+  .update-book-container {
+    padding: 20px;
+  }
+
+  .update-book-card {
+    padding: 20px;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+}
