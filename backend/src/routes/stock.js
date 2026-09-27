@@ -13,7 +13,9 @@ router.get("/search", (req, res) => {
   if (!query || query.trim() === "") {
     return res.status(400).json({ error: "Please enter a search term." });
   }
-  const likeQuery = `%${query}%`;
+
+  const cleanedQuery = query.trim();
+  const likeQuery = `%${cleanedQuery}%`;
 
   const sql = `SELECT * FROM stock WHERE title LIKE ? OR author LIKE ? ORDER BY title ASC`;
 
