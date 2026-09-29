@@ -10,6 +10,12 @@ app.get("/", (req, res) => {
   res.json({ message: "Bellbird API is running" });
 });
 
+const stockRoutes = require("./routes/stock");
+app.use("/api/stock", stockRoutes);
+
+const orderRoutes = require("./routes/orders");
+app.use("/api/orders", orderRoutes);
+
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000");
 });
