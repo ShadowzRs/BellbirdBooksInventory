@@ -32,5 +32,3 @@ node_modules/
 
 # DB
 *.db
-*.sqlite
-*.sqlite3
