@@ -30,5 +30,5 @@ node_modules/
 .env
 .env.*
 
-# Database files — generated locally, not source code
+# DB
 *.db

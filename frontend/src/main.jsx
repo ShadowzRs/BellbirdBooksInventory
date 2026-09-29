@@ -5,8 +5,6 @@ import "./index.css";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    {/* <UserProvider> */}
     <WebRouting />
-    {/* </UserProvider> */}
   </StrictMode>,
 );

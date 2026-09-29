@@ -7,10 +7,6 @@
 
 ## Running the project
 
-### Install Gitbas
-
-- https://git-scm.com/install/windows
-
 ### Frontend
 
 ```bash
