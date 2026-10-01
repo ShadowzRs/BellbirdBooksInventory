@@ -65,7 +65,7 @@ const addStock = (req, res) => {
 // STORY: List and filter stock by section
 
 const searchStock = (req, res) => {
-  const { q } = req.query;
+  const { q, section } = req.query;
 
   try {
     let query = `
@@ -88,6 +88,11 @@ const searchStock = (req, res) => {
 
       parameters.push(searchTerm, searchTerm);
     }
+
+    if (section && section.trim()) {
+     query += ` AND section = ? COLLATE NOCASE`;
+      parameters.push(section.trim());
+    } 
 
     query += ` ORDER BY title ASC`;
 
