@@ -4,6 +4,7 @@ import DashboardPage from "./pages/userPages/Dashboard.jsx";
 
 import AddBookPage from "./pages/stock/AddBookPage.jsx";
 import UpdateSecondHandBook from "./pages/stock/UpdateSecondHandBook.jsx";
+import UpdateStock from "./pages/stock/UpdateStock.jsx";
 import StockPage from "./pages/stock/StockPage.jsx";
 import FullStockListPage from "./pages/stock/FullStockListPage.jsx";
 
@@ -25,6 +26,8 @@ function Routing() {
           path="/update-second-hand-book"
           element={<UpdateSecondHandBook />}
         />
+        <Route path="/update-stock" element={<UpdateStock />}
+/>
         <Route path="/stock" element={<StockPage />} />
         <Route path="/stock/all" element={<FullStockListPage />} />
 
