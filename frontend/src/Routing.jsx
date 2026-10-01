@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/login/LoginPage.jsx";
 import DashboardPage from "./pages/userPages/Dashboard.jsx";
+import UpdateSecondHandBook from "./pages/userPages/UpdateSecondHandBook.jsx";
 
 import AddBookPage from "./pages/stock/AddBookPage.jsx";
 import StockPage from "./pages/stock/StockPage.jsx";
@@ -15,6 +16,8 @@ function Routing() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/update-second-hand-book" element={<UpdateSecondHandBook />}
+/>
 
         <Route path="/stock/:type" element={<AddBookPage />} />
         <Route path="/stock" element={<StockPage />} />
