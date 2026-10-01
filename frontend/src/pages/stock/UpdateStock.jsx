@@ -126,6 +126,7 @@ function UpdateStock() {
       setError(
         "Quantity must be a whole number greater than or equal to 0.",
       );
+
       return;
     }
 
@@ -178,6 +179,66 @@ function UpdateStock() {
     }
   };
 
+    const handleRemove = async () => {
+      setMessage("");
+      setError("");
+
+      if (!selectedBookId) {
+        setError("Please select a book.");
+        return;
+      }
+
+      const confirmed = window.confirm(
+        "Are you sure you want to remove this book from stock?",
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        setSaving(true);
+
+        const response = await fetch(
+          `http://localhost:3000/api/stock/${selectedBookId}`,
+          {
+            method: "DELETE",
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          setError(data.message || "Failed to remove stock.");
+          return;
+        }
+
+        setBooks((previousBooks) =>
+          previousBooks.filter(
+            (book) => String(book.id) !== selectedBookId,
+          ),
+        );
+
+        setSelectedBookId("");
+
+        setFormData({
+          title: "",
+          author: "",
+          quantity: "",
+        });
+
+        setMessage("Book removed from stock successfully.");
+      } catch (err) {
+        setError(
+          "Couldn't connect to the server. Please try again.",
+        );
+      } finally {
+        setSaving(false);
+      }
+    };
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-3xl mx-auto">
@@ -343,6 +404,16 @@ function UpdateStock() {
                 className="w-full bg-green-800 hover:bg-green-900 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium px-6 py-2.5 rounded-lg transition"
               >
                 {saving ? "Saving..." : "Save Updated Stock"}
+              </button>
+
+              {/* REMOVE BUTTON */}
+              <button
+                type="button"
+                onClick={handleRemove}
+                disabled={!selectedBookId || saving}
+                className="w-full mt-3 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium px-6 py-2.5 rounded-lg transition"
+              >
+                {saving ? "Processing..." : "Remove Book"}
               </button>
             </form>
           )}

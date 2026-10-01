@@ -181,9 +181,41 @@ const updateStock = (req, res) => {
   }
 };
 
+// REMOVE STOCK
+// STORY: Remove a book from stock
+const removeStock = (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const statement = db.prepare(`
+      DELETE FROM stock
+      WHERE id = ?
+        AND type = 'new'
+    `);
+
+    const result = statement.run(id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({
+        message: "New stock item not found",
+      });
+    }
+
+    res.json({
+      message: "Book removed from stock successfully",
+    });
+  } catch (error) {
+    console.error("Error removing stock:", error.message);
+
+    res.status(500).json({
+      message: "Failed to remove stock",
+    });
+  }
+};
 module.exports = {
   addStock,
   searchStock,
   getAllStock,
   updateStock,
+  removeStock,
 };
