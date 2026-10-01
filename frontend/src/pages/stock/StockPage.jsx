@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 // Reusable book card
 function StockCard({ book }) {
   const isNew = book.type === "new";
+  const navigate = useNavigate();
 
   return (
     <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50">
@@ -55,19 +56,19 @@ function StockCard({ book }) {
           </span>
         )}
       </div>
+
+      {/* Update button */}
+      <div className="flex justify-end mt-4">
+        <button
+          type="button"
+          onClick={() => navigate(`/stock/update/${book.id}`)}
+          className="bg-green-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-800 transition"
+        >
+          Update Stock
+        </button>
+      </div>
     </div>
   );
-}
-
-function formatSectionName(name) {
-  return name
-    .trim()
-    .toLowerCase()
-    .split(/([\s-])/)
-    .map((part) =>
-      /[\s-]/.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1),
-    )
-    .join("");
 }
 
 function StockPage() {
@@ -85,7 +86,7 @@ function StockPage() {
 
   const navigate = useNavigate();
 
-  // Load the list of sections once, when the page first opens
+  // Load data when the page first opens
   useEffect(() => {
     async function loadSections() {
       try {
@@ -116,6 +117,7 @@ function StockPage() {
 
     loadSections();
   }, []);
+
   // Search books
   async function handleSearch() {
     const searchTerm = query.trim();
@@ -175,8 +177,6 @@ function StockPage() {
   async function handleSectionChange(e) {
     const section = e.target.value;
 
-    console.log("Selected section:", section);
-
     setSelectedSection(section);
     setSectionError("");
 
@@ -196,8 +196,6 @@ function StockPage() {
         )}`;
       }
 
-      console.log("Request URL:", url);
-
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -205,8 +203,6 @@ function StockPage() {
       });
 
       const data = await response.json();
-
-      console.log("Response:", data);
 
       if (!response.ok) {
         setSectionError(

@@ -90,9 +90,9 @@ const searchStock = (req, res) => {
     }
 
     if (section && section.trim()) {
-     query += ` AND section = ? COLLATE NOCASE`;
+      query += ` AND section = ? COLLATE NOCASE`;
       parameters.push(section.trim());
-    } 
+    }
 
     query += ` ORDER BY title ASC`;
 
@@ -130,8 +130,108 @@ const getAllStock = (req, res) => {
   }
 };
 
+// UPDATE STOCK
+// STORY: Update stock details and quantity
+// UPDATE STOCK
+const updateStock = (req, res) => {
+  const { id } = req.params;
+
+  const {
+    title,
+    author,
+    type,
+    section,
+    shelf_location,
+    quantity,
+    condition,
+    price,
+  } = req.body;
+
+  if (!title || !author || !type || !section || price === undefined) {
+    return res.status(400).json({
+      message: "Title, author, type, section and price are required",
+    });
+  }
+
+  try {
+    const statement = db.prepare(`
+      UPDATE stock
+      SET
+        title = ?,
+        author = ?,
+        type = ?,
+        section = ?,
+        shelf_location = ?,
+        quantity = ?,
+        condition = ?,
+        price = ?
+      WHERE id = ?
+    `);
+
+    const result = statement.run(
+      title,
+      author,
+      type,
+      section,
+      shelf_location || null,
+      quantity ?? null,
+      condition || null,
+      price,
+      id,
+    );
+
+    if (result.changes === 0) {
+      return res.status(404).json({
+        message: "Book not found",
+      });
+    }
+
+    res.json({
+      message: "Stock updated successfully",
+    });
+  } catch (error) {
+    console.error("Error updating stock:", error.message);
+
+    res.status(500).json({
+      message: "Failed to update stock",
+    });
+  }
+};
+
+// DELETE STOCK
+const removeStock = (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const statement = db.prepare(`
+      DELETE FROM stock
+      WHERE id = ?
+    `);
+
+    const result = statement.run(id);
+
+    if (result.changes === 0) {
+      return res.status(404).json({
+        message: "Book not found",
+      });
+    }
+
+    res.json({
+      message: "Stock removed successfully",
+    });
+  } catch (error) {
+    console.error("Error deleting stock:", error.message);
+
+    res.status(500).json({
+      message: "Failed to remove stock",
+    });
+  }
+};
+
 module.exports = {
   addStock,
   searchStock,
   getAllStock,
+  updateStock,
+  removeStock,
 };

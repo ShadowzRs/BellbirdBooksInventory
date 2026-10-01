@@ -12,7 +12,6 @@ function Dashboard() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     navigate("/login");
   };
 
@@ -101,14 +100,14 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Admin */}
+      {/* Admin Only */}
       {user?.username === "admin" && (
         <div className="mt-12 border-t-2 border-green-800 pt-6">
           <h2 className="mb-3 text-sm font-bold uppercase tracking-wide text-gray-500">
             Admin
           </h2>
 
-          <Link to="/admin/users" className="block">
+          <Link to="/users" className="block">
             <button
               type="button"
               className="w-full rounded-lg bg-[#1A5F3F] px-4 py-3 text-white transition-colors hover:bg-green-700"

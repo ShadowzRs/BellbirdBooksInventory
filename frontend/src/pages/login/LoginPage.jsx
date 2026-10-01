@@ -33,7 +33,7 @@ function App() {
         return;
       }
 
-      // Store info
+      // Store session
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
 

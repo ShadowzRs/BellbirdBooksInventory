@@ -1,9 +1,12 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/login/LoginPage.jsx";
 import DashboardPage from "./pages/userPages/Dashboard.jsx";
+import UserManagement from "./pages/userPages/UserManagement.jsx";
+import AddUser from "./pages/userPages/AddUser.jsx";
+import UpdateUser from "./pages/userPages/UpdateUser.jsx";
 
 import AddBookPage from "./pages/stock/AddBookPage.jsx";
-import UpdateSecondHandBook from "./pages/stock/UpdateSecondHandBook.jsx";
+import UpdateStock from "./pages/stock/UpdateStock.jsx";
 import StockPage from "./pages/stock/StockPage.jsx";
 import FullStockListPage from "./pages/stock/FullStockListPage.jsx";
 
@@ -19,15 +22,15 @@ function Routing() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/users/add" element={<AddUser />} />
+        <Route path="/users/update/:id" element={<UpdateUser />} />
 
         {/* Stock/Inventory Routing */}
         <Route path="/stock/:type" element={<AddBookPage />} />
-        <Route
-          path="/update-second-hand-book"
-          element={<UpdateSecondHandBook />}
-        />
         <Route path="/stock" element={<StockPage />} />
         <Route path="/stock/all" element={<FullStockListPage />} />
+        <Route path="/stock/update/:id" element={<UpdateStock />} />
 
         {/* Order Routing */}
         <Route path="/orders/new" element={<NewOrderPage />} />
