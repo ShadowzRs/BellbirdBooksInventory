@@ -1,24 +1,54 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
-const initialFormData = {
-  first_name: "",
-  last_name: "",
-  phone_number: "",
-  contact_preference: "call",
-  book_title: "",
-  book_author: "",
-  quantity: "",
-};
-
-function NewOrderPage() {
+function EditOrderPage() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { id } = useParams();
 
-  const [formData, setFormData] = useState(initialFormData);
+  const order = location.state?.order;
+
+  const [formData, setFormData] = useState(
+    order
+      ? {
+          first_name: order.first_name || "",
+          last_name: order.last_name || "",
+          phone_number: order.phone_number || "",
+          contact_preference: order.contact_preference || "call",
+          book_title: order.book_title || "",
+          book_author: order.book_author || "",
+          quantity: order.quantity || "",
+          status: order.status || "unfulfilled",
+        }
+      : null,
+  );
+
   const [message, setMessage] = useState("");
   const [isError, setIsError] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [missingFields, setMissingFields] = useState([]);
+
+  // If someone opens the edit URL directly without
+  // coming from the search page
+  if (!order || !formData) {
+    return (
+      <div className="p-6 max-w-2xl mx-auto">
+        <h1 className="text-2xl font-bold mb-4">Order Not Available</h1>
+
+        <p className="text-gray-600 mb-4">
+          Please search for the order first before trying to update it.
+        </p>
+
+        <button
+          type="button"
+          onClick={() => navigate("/orders/search")}
+          className="bg-green-800 text-white px-4 py-2 rounded"
+        >
+          Back to Search
+        </button>
+      </div>
+    );
+  }
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -28,7 +58,7 @@ function NewOrderPage() {
       [name]: value,
     }));
 
-    // Remove the red border once the user fixes the field
+    // Remove the red border when the field is changed
     setMissingFields((previous) => previous.filter((field) => field !== name));
 
     setMessage("");
@@ -79,6 +109,10 @@ function NewOrderPage() {
       missing.push("quantity");
     }
 
+    if (!["unfulfilled", "collected", "cancelled"].includes(formData.status)) {
+      missing.push("status");
+    }
+
     setMissingFields(missing);
 
     if (missing.length > 0) {
@@ -103,13 +137,22 @@ function NewOrderPage() {
     try {
       const token = localStorage.getItem("token");
 
-      const response = await fetch("http://localhost:3000/api/orders", {
-        method: "POST",
+      const response = await fetch(`http://localhost:3000/api/orders/${id}`, {
+        method: "PUT",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          first_name: formData.first_name,
+          last_name: formData.last_name,
+          phone_number: formData.phone_number,
+          contact_preference: formData.contact_preference,
+          book_title: formData.book_title,
+          book_author: formData.book_author,
+          quantity: Number(formData.quantity),
+          status: formData.status,
+        }),
       });
 
       const data = await response.json();
@@ -117,11 +160,10 @@ function NewOrderPage() {
       if (!response.ok) {
         setMessage(
           data.message ||
-            "Order could not be saved. Please check your details.",
+            "Order could not be updated. Please check your details.",
         );
         setIsError(true);
 
-        // Highlight the field returned by the backend
         if (data.field) {
           setMissingFields([data.field]);
         }
@@ -129,12 +171,12 @@ function NewOrderPage() {
         return;
       }
 
-      setMessage(`${data.message} Order number: ${data.orderId}`);
-      setIsError(false);
-
-      // Clear the fields after successful save
-      setFormData(initialFormData);
-      setMissingFields([]);
+      // Return to search page after successful update
+      navigate("/orders/search", {
+        state: {
+          message: `Order #${id} was updated successfully.`,
+        },
+      });
     } catch (err) {
       setMessage(
         "Couldn't connect to the server. Please check your connection and try again.",
@@ -153,9 +195,15 @@ function NewOrderPage() {
     }`;
   }
 
+  function handleCancel() {
+    navigate("/orders/search");
+  }
+
   return (
     <div className="p-6 max-w-2xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Record a Customer Order</h1>
+      <h1 className="text-2xl font-bold mb-1">Update Customer Order</h1>
+
+      <p className="text-gray-600 mb-4">Order #{id}</p>
 
       <div className="flex flex-col gap-3 mb-4">
         {/* First name */}
@@ -283,6 +331,27 @@ function NewOrderPage() {
             className={getInputClass("quantity")}
           />
         </div>
+
+        {/* Status */}
+        <div>
+          <label htmlFor="status" className="block mb-1">
+            Status:
+          </label>
+
+          <select
+            id="status"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            className={getInputClass("status")}
+          >
+            <option value="unfulfilled">Unfulfilled</option>
+
+            <option value="collected">Collected</option>
+
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
       </div>
 
       {/* Message */}
@@ -300,12 +369,12 @@ function NewOrderPage() {
           disabled={isSaving}
           className="bg-green-800 text-white px-4 py-2 rounded disabled:opacity-50"
         >
-          {isSaving ? "Saving..." : "Save"}
+          {isSaving ? "Saving..." : "Save Changes"}
         </button>
 
         <button
           type="button"
-          onClick={() => navigate(-1)}
+          onClick={handleCancel}
           disabled={isSaving}
           className="border border-gray-300 px-4 py-2 rounded hover:bg-gray-100 disabled:opacity-50"
         >
@@ -316,4 +385,4 @@ function NewOrderPage() {
   );
 }
 
-export default NewOrderPage;
+export default EditOrderPage;

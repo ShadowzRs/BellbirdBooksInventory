@@ -6,6 +6,7 @@ require("./database/initDatabase");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const stockRoutes = require("./routes/stockRoutes");
+const orderRoutes = require("./routes/orderRoutes");
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/stock", stockRoutes);
+app.use("/api/orders", orderRoutes);
 
 // const orderRoutes = require("./routes/orders");
 // app.use("/api/orders", orderRoutes);

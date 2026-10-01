@@ -64,7 +64,7 @@ const createOrdersTable = `
             CHECK (
                 status IN (
                     'unfulfilled',
-                    'fulfilled',
+                    'collected',
                     'cancelled'
                 )
             )
