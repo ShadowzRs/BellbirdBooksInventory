@@ -33,12 +33,30 @@ function StockPage() {
           return;
         }
 
-        // Get unique section names from all stock
-        const uniqueSections = [
-          ...new Set(
-            data.map((book) => book.section).filter((section) => section),
-          ),
-        ];
+         // Turn any spelling/upper-lower case letter into a consistent, neat format in dropdown list 
+        function formatSectionName(name) {
+          return name
+            .trim()
+            .toLowerCase()
+            .split(/([\s-])/)
+            .map((part) =>
+              /[\s-]/.test(part)
+                ? part
+                : part.charAt(0).toUpperCase() + part.slice(1),
+            )
+            .join("");
+        }
+
+        const sectionSet = new Set(
+          data
+            .map((book) => book.section)
+            .filter((section) => section)
+            .map((section) => formatSectionName(section)),
+        );
+
+        const uniqueSections = Array.from(sectionSet).sort((a, b) =>
+          a.localeCompare(b),
+        );
 
         setSections(uniqueSections);
       } catch (err) {
