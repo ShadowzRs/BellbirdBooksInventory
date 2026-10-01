@@ -1,6 +1,75 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Reusable book card
+function StockCard({ book }) {
+  const isNew = book.type === "new";
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50">
+      {/* Book title, author and price */}
+      <div className="flex justify-between gap-4 mb-3">
+        <div>
+          <h4 className="font-semibold text-gray-900">{book.title}</h4>
+
+          <p className="text-sm text-gray-500 mt-1">by {book.author}</p>
+        </div>
+
+        <div className="text-right">
+          <span
+            className={`inline-block text-xs px-2 py-1 rounded-full mb-1 ${
+              isNew
+                ? "bg-green-100 text-green-800"
+                : "bg-amber-100 text-amber-800"
+            }`}
+          >
+            {isNew ? "New" : "Second-hand"}
+          </span>
+
+          <div className="text-green-800 font-semibold whitespace-nowrap">
+            ${Number(book.price).toFixed(2)}
+          </div>
+        </div>
+      </div>
+
+      {/* Book information */}
+      <div className="flex flex-wrap gap-2 text-xs">
+        {/* Shelf */}
+        <span className="bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md">
+          Shelf: {book.shelf_location || "Not assigned"}
+        </span>
+
+        {/* Section */}
+        <span className="bg-blue-50 border border-blue-200 text-blue-700 px-2.5 py-1 rounded-md">
+          Section: {book.section || "Not specified"}
+        </span>
+
+        {/* New book = Quantity / Second-hand = Condition */}
+        {isNew ? (
+          <span className="bg-green-50 border border-green-200 text-green-700 px-2.5 py-1 rounded-md">
+            Quantity: {book.quantity ?? 0}
+          </span>
+        ) : (
+          <span className="bg-amber-50 border border-amber-200 text-amber-700 px-2.5 py-1 rounded-md">
+            Condition: {book.condition || "Not specified"}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function formatSectionName(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .split(/([\s-])/)
+    .map((part) =>
+      /[\s-]/.test(part) ? part : part.charAt(0).toUpperCase() + part.slice(1),
+    )
+    .join("");
+}
+
 function StockPage() {
   // Search feature state
   const [query, setQuery] = useState("");
@@ -33,30 +102,11 @@ function StockPage() {
           return;
         }
 
-         // Turn any spelling/upper-lower case letter into a consistent, neat format in dropdown list 
-        function formatSectionName(name) {
-          return name
-            .trim()
-            .toLowerCase()
-            .split(/([\s-])/)
-            .map((part) =>
-              /[\s-]/.test(part)
-                ? part
-                : part.charAt(0).toUpperCase() + part.slice(1),
-            )
-            .join("");
-        }
-
-        const sectionSet = new Set(
-          data
-            .map((book) => book.section)
-            .filter((section) => section)
-            .map((section) => formatSectionName(section)),
-        );
-
-        const uniqueSections = Array.from(sectionSet).sort((a, b) =>
-          a.localeCompare(b),
-        );
+        const uniqueSections = [
+          ...new Set(
+            data.map((book) => book.section).filter((section) => section),
+          ),
+        ].sort((a, b) => a.localeCompare(b));
 
         setSections(uniqueSections);
       } catch (err) {
@@ -66,7 +116,7 @@ function StockPage() {
 
     loadSections();
   }, []);
-
+  // Search books
   async function handleSearch() {
     const searchTerm = query.trim();
 
@@ -96,6 +146,7 @@ function StockPage() {
         return;
       }
 
+      // Separate new and second-hand books
       const newBooks = data.filter((book) => book.type === "new");
 
       const secondHandBooks = data.filter(
@@ -114,13 +165,17 @@ function StockPage() {
       setErrorMessage(
         "Couldn't connect to the server. Please check your connection and try again.",
       );
+
       setNewStock([]);
       setSecondHandStock([]);
     }
   }
 
+  // Handle section filter
   async function handleSectionChange(e) {
     const section = e.target.value;
+
+    console.log("Selected section:", section);
 
     setSelectedSection(section);
     setSectionError("");
@@ -141,6 +196,8 @@ function StockPage() {
         )}`;
       }
 
+      console.log("Request URL:", url);
+
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -148,6 +205,8 @@ function StockPage() {
       });
 
       const data = await response.json();
+
+      console.log("Response:", data);
 
       if (!response.ok) {
         setSectionError(
@@ -159,7 +218,10 @@ function StockPage() {
 
       setSectionStock(data);
     } catch (err) {
+      console.error("Section filter error:", err);
+
       setSectionError("Couldn't connect to the server. Please try again.");
+
       setSectionStock([]);
     }
   }
@@ -200,6 +262,7 @@ function StockPage() {
             </p>
           </div>
 
+          {/* Search input */}
           <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
@@ -215,6 +278,7 @@ function StockPage() {
             />
 
             <button
+              type="button"
               onClick={handleSearch}
               className="bg-green-800 hover:bg-green-900 text-white font-medium px-6 py-2.5 rounded-lg transition"
             >
@@ -222,6 +286,7 @@ function StockPage() {
             </button>
           </div>
 
+          {/* Search error */}
           {errorMessage && (
             <div className="mt-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
               {errorMessage}
@@ -241,36 +306,7 @@ function StockPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {newStock.map((book) => (
-                  <div
-                    key={book.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50"
-                  >
-                    <div className="flex justify-between gap-4 mb-3">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">
-                          {book.title}
-                        </h4>
-
-                        <p className="text-sm text-gray-500 mt-1">
-                          by {book.author}
-                        </p>
-                      </div>
-
-                      <span className="text-green-800 font-semibold whitespace-nowrap">
-                        ${Number(book.price).toFixed(2)}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 text-xs">
-                      <span className="bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md">
-                        Shelf: {book.shelf_location || "Not assigned"}
-                      </span>
-
-                      <span className="bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md">
-                        Quantity: {book.quantity ?? 0}
-                      </span>
-                    </div>
-                  </div>
+                  <StockCard key={`new-${book.id}`} book={book} />
                 ))}
               </div>
             </div>
@@ -292,36 +328,7 @@ function StockPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {secondHandStock.map((book) => (
-                  <div
-                    key={book.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50"
-                  >
-                    <div className="flex justify-between gap-4 mb-3">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">
-                          {book.title}
-                        </h4>
-
-                        <p className="text-sm text-gray-500 mt-1">
-                          by {book.author}
-                        </p>
-                      </div>
-
-                      <span className="text-green-800 font-semibold whitespace-nowrap">
-                        ${Number(book.price).toFixed(2)}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 text-xs">
-                      <span className="bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md">
-                        Shelf: {book.shelf_location || "Not assigned"}
-                      </span>
-
-                      <span className="bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md">
-                        Condition: {book.condition || "Not specified"}
-                      </span>
-                    </div>
-                  </div>
+                  <StockCard key={`second-hand-${book.id}`} book={book} />
                 ))}
               </div>
             </div>
@@ -340,6 +347,7 @@ function StockPage() {
             </p>
           </div>
 
+          {/* Section dropdown */}
           <select
             value={selectedSection}
             onChange={handleSectionChange}
@@ -356,12 +364,14 @@ function StockPage() {
             ))}
           </select>
 
+          {/* Section error */}
           {sectionError && (
             <div className="mt-4 bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg px-4 py-3">
               {sectionError}
             </div>
           )}
 
+          {/* No stock */}
           {selectedSection && sectionStock.length === 0 && !sectionError && (
             <div className="mt-6 text-center py-8 border border-dashed border-gray-300 rounded-lg">
               <p className="text-gray-500 text-sm">
@@ -370,6 +380,7 @@ function StockPage() {
             </div>
           )}
 
+          {/* Section stock results */}
           {sectionStock.length > 0 && (
             <div className="mt-6">
               <div className="flex items-center justify-between mb-3">
@@ -385,42 +396,7 @@ function StockPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {sectionStock.map((book) => (
-                  <div
-                    key={book.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition bg-gray-50"
-                  >
-                    <div className="flex justify-between gap-4 mb-3">
-                      <div>
-                        <h4 className="font-semibold text-gray-900">
-                          {book.title}
-                        </h4>
-
-                        <p className="text-sm text-gray-500 mt-1">
-                          by {book.author}
-                        </p>
-                      </div>
-
-                      <span className="text-green-800 font-semibold whitespace-nowrap">
-                        ${Number(book.price).toFixed(2)}
-                      </span>
-                    </div>
-
-                    <div className="flex flex-wrap gap-2 text-xs">
-                      <span className="bg-white border border-gray-200 text-gray-600 px-2.5 py-1 rounded-md">
-                        Shelf: {book.shelf_location || "Not assigned"}
-                      </span>
-
-                      {book.type === "new" ? (
-                        <span className="bg-green-50 border border-green-200 text-green-700 px-2.5 py-1 rounded-md">
-                          Quantity: {book.quantity ?? 0}
-                        </span>
-                      ) : (
-                        <span className="bg-amber-50 border border-amber-200 text-amber-700 px-2.5 py-1 rounded-md">
-                          Condition: {book.condition || "Not specified"}
-                        </span>
-                      )}
-                    </div>
-                  </div>
+                  <StockCard key={`section-${book.id}`} book={book} />
                 ))}
               </div>
             </div>
