@@ -65,30 +65,28 @@ const addStock = (req, res) => {
 // STORY: List and filter stock by section
 
 const searchStock = (req, res) => {
-  const { title, author, section } = req.query;
+  const { q } = req.query;
 
   try {
     let query = `
-            SELECT *
-            FROM stock
-            WHERE 1 = 1
-        `;
+      SELECT *
+      FROM stock
+      WHERE 1 = 1
+    `;
 
     const parameters = [];
 
-    if (title) {
-      query += ` AND title LIKE ?`;
-      parameters.push(`%${title}%`);
-    }
+    if (q && q.trim()) {
+      query += `
+        AND (
+          title LIKE ? COLLATE NOCASE
+          OR author LIKE ? COLLATE NOCASE
+        )
+      `;
 
-    if (author) {
-      query += ` AND author LIKE ?`;
-      parameters.push(`%${author}%`);
-    }
+      const searchTerm = `%${q.trim()}%`;
 
-    if (section) {
-      query += ` AND section = ?`;
-      parameters.push(section);
+      parameters.push(searchTerm, searchTerm);
     }
 
     query += ` ORDER BY title ASC`;

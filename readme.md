@@ -1,11 +1,23 @@
 # Bellbird Project
 
+Bellbird Books management system.
+
 ## Project Structure
 
 - `frontend/` - React frontend
 - `backend/` - Express backend
 
-## Running the project
+## Features
+
+- User login
+- Stock management
+- Search and filter stock
+- Add new and second-hand books
+- Create and search customer orders
+- View outstanding orders
+- Update customer orders
+
+## Running the Project
 
 ### Frontend
 
@@ -13,7 +25,6 @@
 cd frontend
 npm install
 npm run dev
-
 ```
 
 ### Backend
@@ -22,5 +33,15 @@ npm run dev
 cd backend
 npm install
 npm start
-
 ```
+
+Run the frontend and backend in separate terminals.
+
+## Technologies
+
+- React
+- Tailwind CSS
+- Node.js
+- Express
+- SQLite
+- JWT
