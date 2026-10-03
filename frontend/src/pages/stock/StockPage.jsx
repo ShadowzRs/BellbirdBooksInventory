@@ -71,6 +71,20 @@ function StockCard({ book }) {
   );
 }
 
+// Prevents duplicate section entries in the dropdown caused by inconsistent capitalization
+function formatSectionName(name) {
+  return name
+    .trim()
+    .toLowerCase()
+    .split(/([\s-])/)
+    .map((part) =>
+      /[\s-]/.test(part)
+        ? part
+        : part.charAt(0).toUpperCase() + part.slice(1),
+    )
+    .join("");
+}
+
 function StockPage() {
   // Search feature state
   const [query, setQuery] = useState("");
@@ -103,11 +117,14 @@ function StockPage() {
           return;
         }
 
-        const uniqueSections = [
-          ...new Set(
-            data.map((book) => book.section).filter((section) => section),
+        const uniqueSections = Array.from(
+          new Set(
+            data
+              .map((book) => book.section)
+              .filter((section) => section)
+              .map((section) => formatSectionName(section)),
           ),
-        ].sort((a, b) => a.localeCompare(b));
+        ).sort((a, b) => a.localeCompare(b));
 
         setSections(uniqueSections);
       } catch (err) {
